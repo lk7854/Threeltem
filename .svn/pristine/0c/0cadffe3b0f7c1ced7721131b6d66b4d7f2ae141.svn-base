@@ -1,0 +1,253 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <base href="<%=basePath%>">
+    
+    <title></title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<!-- <link rel="stylesheet" href="css/font_eolqem241z66flxr.css" media="all" />
+	<link rel="stylesheet" href="css/news.css" media="all" /> -->
+	<!-- <script type="text/javascript" src="js/jquery-3.1.1.js"></script> -->
+	<link rel="stylesheet" href="layui-v2.3.0/layui/css/layui.css" media="all" />
+	<script type="text/javascript" src="layui-v2.3.0/layui/layui.js"></script>
+	<script type="text/javascript">
+		var $ = null;
+		var table = null;
+		var layer = null;
+		var form = null;
+		var treload = null;
+		
+		layui.use(['layer','table','form'],function(){
+			$ = layui.jquery;
+			table = layui.table;//获取layui的表格对象
+			layer = layui.layer;
+			form = layui.form;
+			layer.msg('Hello World');//弹出框
+			//执行一个table示例
+			treload = table.render({
+				elem:"#tb",
+				url:"indent/identQuery.do?i_state=-2",
+				// cellMinWidth:true, 
+				page:true,
+				cols:[[
+					{field:"i_id",title:"编号",width:138,sort:true,fiexed:"left",align:"center"},
+					{field:"i_addTime",title:"创建时间",align:"center"},
+					{field:"i_startTime",title:"预计投放时间",align:"center"},
+					{field:"i_endTime",title:"预计结束时间",align:"center"},
+					/* {field:"i_remark",title:"备注",sort:true,align:"center"}, */
+					{field:"uname",title:"创建人",width:75,align:"center"},
+					{field:"i_state",title:"状态",width:90,sort:true,align:"center",templet:function(d){
+						if(d.i_state==1){return "已撤销";}
+						if(d.i_state==3){return "<i style='color:blue;'>已完成</i>";}
+						if(d.i_state==4){return "<i style='color:red;'>待投放</i>";}
+						if(d.i_state==5){return "<i style='color:green;'>执行中</i>";}
+					}},
+					{field:"s_name",title:"广告位",width:90,align:"center"},
+					{field:"",title:"操作",align:"center",toolbar:"#tool",fixed:"right"},
+				]],
+			});
+			
+			
+			table.on('tool(table)',function(obj){
+				//获取点击行的数据
+				var clickdata = obj.data;
+				//获取点击的元素的lay-event属性值
+				var clickevent = obj.event;
+				//判断
+				if(clickevent == "detail"){
+					//即查看详情,,进行操作
+					//填充数据，并打开详情窗口
+					if(clickdata.i_state!=1 && clickdata.i_state!=5 && clickdata.i_state!=3){
+						showWinDetails(clickdata);
+					} else {
+						layer.alert("执行中/已完成/已撤销的订单不能标记！",{title:"提示",icon:"2",shade:false,offset:"rb"});
+					}
+				}
+				if(clickevent == "canael"){
+					if(clickdata.i_state==5){
+						layer.confirm("确定撤销？",{icon:3,shadeClose:true},function(index){
+							//修改订单状态
+							//$.post
+							layer.close(index);
+						});
+					} else {
+						layer.alert("未投放/已完成的订单不能撤销！",{icon:2,shadeClose:true});
+					}
+				}
+			});
+			//监听下拉列表
+			form.on("select(selectstate)",function(data){
+				query();
+			});
+			
+		});
+		
+		//详情窗口
+		function showWinDetails(data){
+			form.val("fm",data);
+			//打开窗口
+			layer.open({
+				title:"投放信息",
+				type:1,
+				offset: 'auto',
+				icon:6,
+				shadeClose:true,//点击遮罩层关闭弹窗
+				anim:4,//弹出动画
+				content:$('#content'),
+				area: ['600px', '560px'],//宽高
+				btn:['标记投放'],
+				yes:function(){
+					//修改订单状态，位执行中
+					$.post("indent/up.do",{"i_id":data.i_id,"i_state":5,"i_startTime2":new Date()},function(data){
+						if(data){
+							layer.alert("标记成功！",{title:"提示",icon:"1",shade:false,offset:"rb"});
+						}
+					});
+					treload.reload();
+				}
+			});
+		}
+		
+		//根据订单编号查询订单
+		function query(){
+			var id = $("#i_id").val();
+			treload.reload({
+				page: {
+		          	curr: 1, //重新从第 1 页开始
+		        },
+				where:{
+					i_id:id,
+				}
+			});
+		}
+		
+		function show1(id){
+			var url = $("#"+id).val();
+			var json= 
+			{
+			  "title": "标题", //相册标题
+			  "id": 123, //相册id
+			  "start": 0, //初始显示的图片序号，默认0
+			  "data": [   //相册包含的图片，数组格式
+			  {
+			   "alt": "图片名",
+			   "pid": 666, //图片id
+			   "src": url, //原图地址
+			   "thumb": url //缩略图地址
+			  }
+			]};
+			
+			layer.photos({
+				photos:json,
+				shift:5
+			});
+		}
+		//投放广告后，修改状态
+		function execute(){
+			
+		}
+	</script>
+  </head>
+  
+  <body>
+  	<blockquote class="layui-elem-quote news_search" style="margin-left:10px;margin-top:10px;">
+		<div class="layui-inline">
+			<form class="layui-form" >
+				<label class="layui-form-label">条件：</label>
+			    <div class="layui-input-inline">
+			    	<input type="text" placeholder="订单编号" id="i_id" class="layui-input search_input">
+			    </div>
+			    <a id="select" onclick="query()" class="layui-btn layui-btn-radius layui-btn-normal">查询</a>
+		    </form>
+		</div>
+	</blockquote>
+	<!-- 数据表格 -->
+    <table id="tb" lay-filter="table"></table>
+    <!-- 工具栏 -->
+    <script type="text/html" id="tool">
+		<a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-normal" lay-event="detail">投放信息</a>
+		<a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="canael">标记撤销</a>
+	</script>
+	<!-- 详情框 -->
+    <div hidden id="content">
+    	<form id="fm" method="post" style="width:100%; margin-top:5px;" lay-filter="fm" class="layui-form">
+    		<div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">订单编号</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="i_id" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">广告名</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="p_name" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">广告类型</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="pt_name" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">广告内容连接</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="p_url" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">目标连接</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="i_formPage" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">广告位</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="s_name" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">广告位类型</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="st_name" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">系统预计投放时间</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="i_startTime" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">实际投放时间</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="i_startTime2" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label" style="width:120px;">订单备注</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="i_remark" autocomplete="off" class="layui-input" style="width:400px;">
+		    </div>
+		  </div>
+		  <input type="text" hidden id="img2" name="p_url">
+    	</form>
+    	<label class="layui-form-label" style="width:120px;">预览</label>
+    	<div class="layui-btn-group " style="width:70%;text-align: left;">
+			<a class="layui-btn" onclick="show1('img2')">广告</a>
+		</div>
+    </div>
+  </body>
+</html>

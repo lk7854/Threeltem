@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.AccBDao">
+	<update id="accbUp" parameterType="AccountBalance">
+		update AccountBalance set 
+		ab_money=#{ab_money},
+		ab_freezeMoney=#{ab_freezeMoney},
+		ab_time=now()
+		where u_id=#{u_id}
+	</update>
+	
+	<select id="queryAcbyUid" parameterType="Integer" resultType="Map">
+		select * from users u, AccountBalance a where u.u_id = a.u_id and u.u_id = #{0}
+	</select>
+	
+</mapper>

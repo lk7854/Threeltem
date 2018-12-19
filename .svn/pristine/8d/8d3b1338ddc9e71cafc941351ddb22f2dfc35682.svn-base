@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.PosterDao">
+
+	<update id="Up" parameterType="Poster">
+		update poster 
+		<set>
+			<trim suffix=",">
+				<if test="post!=null">
+					<if test="post.p_name!=null">
+						p_name = #{post.p_name},
+					</if>
+					<if test="post.p_state!=null">
+						p_state = #{post.p_state},
+					</if>
+					<if test="post.p_remark!=null">
+						p_remark = #{post.p_remark},
+					</if>
+					<if test="post.p_url!=null">
+						p_url = #{post.p_url},
+					</if>
+					p_updateTime = now()
+				</if>
+			</trim>
+		</set>
+		where p_id = #{post.p_id}
+	</update>
+
+
+	<select id="query" resultType="Map">
+		select p_id,p_name,u_id,getUname(u_id) upname,p_state,p_addTime,
+		p_updateTime,p_remark,getPTname(pt_id) pt_name,p_url from poster
+		<if test="param1!=null">
+			<where>
+				<if test="param1.u_id!=null">
+					and u_id=#{param1.u_id}
+				</if>
+				<if test="param1.p_name!=null">
+					and p_name like concat('%',#{param1.p_name},'%')
+				</if>
+				<if test="param1.p_state!=null">
+					and p_state = #{param1.p_state}
+				</if>
+			</where>
+		</if>
+		order by p_id desc
+		<if test="param2!=null and param3!=null">
+			limit #{param2},#{param3}
+		</if>
+	</select>
+	
+	
+</mapper>

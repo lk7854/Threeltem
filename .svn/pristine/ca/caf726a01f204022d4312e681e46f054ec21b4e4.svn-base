@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.lk.UsersDao">
+
+	<!-- 登录 -->
+	<select id="login" resultType="Map">
+		select u.u_id,u.u_name,u.u_pwd,u.user_id,u.u_state,
+		u.in_id,i.in_id,i.in_name,i.in_address,i.in_certificate,i.in_man,
+		i.in_phone,i.u_id,i.in_state,i.in_addtime,i.in_updatetime,i.in_remark,
+		u.r_id,r.r_name,
+		u.u_addtime,u.u_updatetime,
+		a.ab_id,a.u_id,a.ab_money,a.ab_freezeMoney,a.ab_time
+		from users u 
+		left join institution i on u.in_id=i.in_id
+		left join roless r on u.r_id=r.r_id
+		left join accountBalance a on u.u_id=a.u_id
+		where u.u_name=#{param1} and u.u_pwd=MD5(#{param2}) and u.u_state=0
+	</select>
+	
+	<insert id="addUsers" parameterType="Users">
+		<selectKey keyColumn="u_id" keyProperty="u_id" order="BEFORE" resultType="Integer">
+			select MAX(u_id)+1 from users
+		</selectKey>
+			insert into users(u_id,u_name,u_pwd,user_id,u_state,in_id
+			,r_id,u_addtime,u_updatetime) 
+			values
+			(#{u_id},#{u_name},MD5(#{u_pwd}),#{user_id},0
+			,#{in_id},#{r_id},NOW(),NOW())
+	</insert>
+	
+	<update id="updateUsers" parameterType="Users">
+		update users 
+		<set>
+			<if test="u_pwd != null">
+				u_pwd = MD5(#{u_pwd}),
+			</if>
+			<if test="u_state != null">
+				u_state = #{u_state},
+			</if>
+		</set>
+		where u_id=#{u_id}
+	</update>
+	
+	<insert id="addInstitution" parameterType="Institution">
+		<selectKey keyColumn="in_id" keyProperty="in_id" order="BEFORE" resultType="Integer">
+			select MAX(in_id)+1 from institution
+		</selectKey>
+			insert into institution(in_id,in_name,in_address,in_certificate
+			,in_man,u_id,in_phone,in_state,in_addtime,in_updatetime,blid,in_remark) 
+			values
+			(#{in_id},#{in_name},#{in_address},#{in_certificate},#{in_man}
+			,#{u_id},#{in_phone},0,NOW(),NOW(),#{blid},#{in_remark})
+	</insert>
+	
+	<insert id="addChannel" parameterType="Channel">
+		<selectKey keyColumn="ch_id" keyProperty="ch_id" order="BEFORE" resultType="Integer">
+			select MAX(ch_id)+1 from channel
+		</selectKey>
+			insert into channel(ch_id,ch_name,in_id,u_id,ch_state,
+			gt_id,gt_pv,ch_addtime,ch_updatetime,ch_url) 
+			values
+			(#{ch_id},#{ch_name},#{in_id},#{u_id},0,1,#{gt_pv},NOW(),
+			NOW(),#{ch_url})
+	</insert>
+	
+	<insert id="addBusinessLicense" parameterType="BusinessLicense">
+		<selectKey keyColumn="blid" keyProperty="blid" order="BEFORE" resultType="Integer">
+			select MAX(blid)+1 from businessLicense
+		</selectKey>
+			insert into businessLicense(blid,name,person,address,
+			reg_num,business,capital,establish_date,valid_period,addTime) 
+			values
+			(#{blid},#{name},#{person},#{address},#{reg_num},#{business},
+			#{capital},#{establish_date},#{valid_period},#{addTime})
+	</insert>
+	
+	<update id="updateInstitution" parameterType="Institution">
+		update institution
+		<choose>
+				<when test="in_id == null">
+					<set>
+						in_id = -1
+					</set>
+				</when>
+				<otherwise>
+					<set>
+						<if test="in_address != null">
+							in_address = #{in_address},
+						</if>
+						<if test="in_certificate != null">
+							in_certificate = #{in_certificate},
+						</if>
+						<if test="in_man != null">
+							in_man = #{in_man},
+						</if>
+						<if test="in_phone != null">
+							in_phone = #{in_phone},
+						</if>
+						<if test="in_remark != null">
+							in_remark = #{in_remark},
+						</if>
+					</set>
+				</otherwise>
+			</choose>
+		<where> 
+			<choose>
+				<when test="in_id == null">
+					in_id=-1
+				</when>
+				<otherwise>
+					in_id=#{in_id}
+				</otherwise>
+			</choose>
+		</where>
+	</update>
+	
+	<select id="queryInstitution" parameterType="Institution" resultType="Map">
+		select * from institution where 1=1 and  in_phone =  #{in_phone}
+	</select>
+	
+	<select id="selectInstitution" parameterType="Institution" resultType="Map">
+		select * from institution 
+	</select>
+	
+	<select id="queryUsers" parameterType="Users" resultType="Map">
+		select u.u_id,u.u_name,u.u_pwd,u.user_id,u.u_state,
+		u.in_id,i.in_id,i.in_name,i.in_address,i.in_certificate,i.in_man,
+		i.in_phone,i.u_id,i.in_state,i.in_addtime,i.in_updatetime,i.in_remark,
+		u.r_id,r.r_name,
+		u.u_addtime,u.u_updatetime,
+		a.ab_id,a.u_id,a.ab_money,a.ab_freezeMoney,a.ab_time
+		from users u 
+		left join institution i on u.in_id=i.in_id
+		left join roless r on u.r_id=r.r_id
+		left join accountBalance a on u.u_id=a.u_id
+		<where>
+			<if test="null!=param1">
+				<if test="null!=param1.u_name">
+			 		and u_name like concat('%',#{param1.u_name},'%')
+			 	</if>
+			</if>
+		</where>
+		<if test="null!=param2 and null!=param3">
+		 limit #{param2},#{param3}
+		</if>
+	</select>
+</mapper>

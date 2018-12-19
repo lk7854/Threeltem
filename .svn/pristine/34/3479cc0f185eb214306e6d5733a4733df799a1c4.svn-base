@@ -1,0 +1,8 @@
+mysqldriver=com.mysql.jdbc.Driver
+sqlurl=jdbc\:mysql\://192.168.43.114\:3306/lastitems?useUnicode\=true&characterEncoding\=utf8
+mysqluname=root
+mysqlpwd=13141413
+oracledriver=oracle.jdbc.driver.OracleDriver
+oracleurl=jdbc\:oracle\:thin\:@127.0.0.1\:1521\:orcl
+oracleuname=lastitem
+oraclepwd=123456

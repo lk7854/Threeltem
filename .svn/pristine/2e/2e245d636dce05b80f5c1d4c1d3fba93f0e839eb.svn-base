@@ -1,0 +1,58 @@
+package com.aaa.service.jck;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aaa.dao.jck.JckIndentDao;
+import com.aaa.entity.Feedback;
+import com.aaa.entity.Indent;
+import com.aaa.entity.LayuiQuery;
+
+@Service
+@Transactional
+public class JckIndentService {
+
+	@Autowired
+	JckIndentDao jid;
+	//添加订单
+	public synchronized int AddIndent(Indent i,Integer day,HttpSession session){
+		SimpleDateFormat sdt=new SimpleDateFormat("yyyyMMddhhmmss");
+		i.setI_id(sdt.format(new Date()));
+		@SuppressWarnings("unchecked")
+		Map<String, Object> map=(Map<String, Object>) session.getAttribute("login");
+		if (i.getI_money()>Integer.parseInt(map.get("ab_money").toString())) {
+			return -1;
+		}
+		return jid.AddIndent(i, day);
+	}
+	//查询订单
+	public LayuiQuery selIndents(Indent i,Integer page,Integer limit,Feedback f){
+		Integer offset = 0;
+		if (null == page && null == limit) {
+			limit = 10;
+		} else {
+			offset = (page - 1) * limit;
+		}
+		// 判断，条件为空时查询全部
+		if ("" == i.getI_id())
+			i.setI_id(null);
+		// 判断状态码-1时查询所有订单
+		if (null != i.getI_state() && -1 == i.getI_state())
+			i.setI_state(null);
+		List<Map<String, Object>> list = jid.selIndents(i, offset, limit,f);
+		Integer count = jid.selIndents(i, null, null,null).size();
+		LayuiQuery lq = new LayuiQuery();
+		lq.setCode(0);
+		lq.setCount(count);
+		lq.setData(list);
+		return lq;
+	}
+}

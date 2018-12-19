@@ -1,0 +1,32 @@
+package com.aaa.service.tb;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aaa.dao.tb.InformationDao;
+import com.aaa.entity.Information;
+
+/**
+ * 消息通知的业务逻辑层
+ * 
+ * @author Administrator
+ * 
+ */
+@Service
+@Transactional
+public class InformationService {
+	@Autowired
+	InformationDao id;
+
+	/**
+	 * 添加消息通知
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public Integer addInfo(Information info) {
+		return id.addInfo(info);
+	}
+
+}

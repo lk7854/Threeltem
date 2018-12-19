@@ -1,0 +1,58 @@
+package com.aaa.util.tb.help;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Tools {
+
+	/**
+	 * 任何数据类型转换成Integer类型
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public static Integer toInteger(Object obj) {
+		if (null != obj) {
+			return Integer.parseInt(obj.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * 转化Double类型
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public static Double toDouble(Object obj) {
+		if (null != obj) {
+			return Double.parseDouble(obj.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * 转换string类型
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public static String toStr(Object obj) {
+		if (null != obj) {
+			return obj.toString();
+		}
+		return null;
+	}
+
+	/**
+	 * 获取当前系统时间
+	 * 
+	 * @param format
+	 * 
+	 * @return
+	 */
+	public static String getNowDate(String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(new Date());
+	}
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.MoneyChangeDao">
+<!-- public List<Map<String, Object>> selMoneyChange(MoneyChange mc); -->
+	<select id="selMoneyChange" resultType="Map">
+		select sum(mc_money) sum,date(mc_time) time from moneychange where mc_type=4 and mc_remark like concat('%',#{0},'%') GROUP BY date(mc_time);
+	</select>
+</mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.IndentCheckDao">
+	<insert id="addRecord" parameterType="IndentCheck">
+		insert into indentCheck(
+			i_id,
+			u_id,
+			ic_time,
+			ic_result,
+			ic_remark
+		) values(#{i_id},#{u_id},now(),#{ic_result},#{ic_remark})
+	</insert>
+</mapper>

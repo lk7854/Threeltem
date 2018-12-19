@@ -1,0 +1,402 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <base href="<%=basePath%>">
+    
+    <title>My JSP 'slotInfo.jsp' starting page</title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<!--
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	-->
+
+ 	<link rel="stylesheet" href="layui-v2.3.0/layui/css/layui.css">
+	<script type="text/javascript" src="layui-v2.3.0/layui/layui.js"></script>
+</head>
+<script>
+var $=null;
+var form=null;
+var table=null;
+var data=null;
+var laydate=null;
+layui.use(['table','form','laydate'], function(){
+   table= layui.table;
+  $=layui.jquery;
+  form=layui.form;
+  laydate=layui.laydate;
+  table.render({
+    elem: '#slotShow'
+    ,url: 'jckS/showSlot.do' //数据接口
+    ,cellMinWidth:true
+    ,page: true //开启分页
+    ,cols: [[ //表头
+      {field: 's_name', title: '广告位名'}
+      ,{field: 's_hight', title: '广告位高度', sort: true}
+      ,{field: 's_width', title: '广告位宽度', sort: true} 
+      ,{field: 's_money', title: '价格', sort: true}
+      ,{field: 'st_name', title: '广告位类型'}
+      ,{field: 's_picture', title: '广告位小图',templet:function(f){
+      		return "<img src="+f.s_picture+" style='height:100%;width:100%;' />";
+      }}
+      ,{field: 'ch_name', title: '网站'}
+      ,{field: 'gt_id', title: '网站级别', sort: true}
+      ,{field: 'gt_pv', title: '日均访问量', sort: true}
+      ,{fixed: 'right', align:'center', toolbar: '#barDemo'}
+    ]]
+    ,done:[slotType(),channel(),billingtype(),showPoster()]
+  });
+  //图片层的监听事件
+  layer.photos({
+	  photos: '#layer-photos-demo'
+	  ,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+	});
+  table.on('tool(demo)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+    data = obj.data //获得当前行数据
+    ,layEvent = obj.event; //获得 lay-event 对应的值
+    if(layEvent == 'detail'){
+	      layer.open({
+	      type:1
+	      ,shade:0
+		  ,title: '广告位预览(图中带彩色部分为广告位)'
+		  ,area:['928px','580px']
+		  ,content: $("#div1")
+		  ,shadeClose:false
+		  ,maxmin:true
+		  ,moveOut: true
+		}); 
+		if(images(data)){
+				
+				$("#layer-photos-demo").append("<img layer-src='"+data.s_picture+"' src='"+
+					data.s_picture+"' alt='网站-->"+data.ch_name+",广告位类型-->"+data.st_name+",广告位-->"+
+					data.s_name+"'  height='300px;' width='300px;' sid='"+data.s_id+"'/>");
+					$("#img").remove();
+		}
+    } else if(layEvent == 'order'){
+    	layer.open({
+		  title: '订单类型选择'
+		  , type: 1
+		  ,area:['520px']
+		  ,content: $("#div")
+		});
+      	/* //填充表单
+		form.val("fo",data);
+		//打开新建订单的窗口
+      	layer.open({
+		  title: '订单制作'
+		  , type: 1
+		  ,area:['520px']
+		  ,content: $("#placeAnOrder")
+		});  */
+		
+    }
+  });
+	  
+	//计费方式的监听下拉列表
+	form.on("select(formDemo)",function(a){
+		chargepar($(a)[0].value);
+	});
+	//收费方式的监听下拉列表
+	form.on("select(formDemo2)",function(){
+		var money=parseInt($("#chargepar option:selected").attr("money"));
+		if ($("#day").val().length!=0) {
+			money=parseInt(money*parseInt($("#day").val()));
+			 $("input[name='i_money']").val(money+parseInt(data.s_money));
+		}else{
+			 $("input[name='i_money']").val(money+parseInt(data.s_money));
+		}
+		//$("#publ").val(money);
+	});
+	//日期时间范围
+  laydate.render({
+    elem: '#test'
+    ,type: 'datetime'
+    ,range: '~'
+    ,min: 1
+    ,calendar:true
+  });
+});
+function btn1(){
+$.get("jckIn/selIndents.do",{"s_id":data.s_id,"page":1,"limit":10},function(data){
+	alert(JSON.stringify(data));
+});
+  layer.open({
+		  title: '时间选择'
+		  , type: 1
+		  ,area:['520px']
+		  ,content: $("#d")
+		});
+}
+//天数框里的数据发生改变时触发
+function selectdays(a){
+	if($("#publ").val().length!=0){
+		if($("input[name='i_money']").val().length!=0&&$(a).val().length!=0&&parseInt($(a).val())>0){
+			$("input[name='i_money']").val(parseInt($(a).val())*parseInt(
+			$("#chargepar option:selected").attr("money"))+parseInt(data.s_money));
+		}else{
+			$("input[name='i_money']").val($("#publ").val());
+		}
+	}
+}
+//自己的广告显示
+function showPoster(){
+	$.post("post/postQuery.do",{"u_id":2,"page":-1,"limit":-1},function(data){
+		for(var i=0;i<data.data.length;i++){
+			$("#poster").append("<option value='"+data.data[i].p_id+"'>"+data.data[i].p_name+"</option>");
+		}
+		
+	});
+}
+//判断点击的照片在弹出层中是否存在，如果存在不让再次添加节点
+function images(data){
+var falg;
+$("#layer-photos-demo img").each(function(){
+			if($(this).attr("sid")==data.s_id)
+			{
+				falg= false;
+				return false;
+			}
+			else
+				falg= true;
+		});
+	return falg;
+}
+//添加计费方式
+function billingtype(){
+	$("#billingtype").append("<option value='0'>请选择：</option>");
+	$.post("billingType/selBil.do",function(data){
+		for(var i=0;i<data.length;i++){
+			$("#billingtype").append("<option value='"+data[i].bt_id+"'>"+data[i].bt_name+"</option>");
+		}
+		form.render("select");
+	});
+}
+//添加收费标准
+function chargepar(datas){
+	$("#chargepar option").remove();
+	var money="";
+	$.post("chargepar/selChargepar.do",{"btid":datas},function(dat){
+		if(datas==1){
+			for(var i=0;i<dat.length;i++){
+				money=(dat[i].cp_money)*(data.s_clickcount);
+				/* if ($("#day").val().length<=0) { */
+					money=parseInt(money);
+				/* }else{
+					money=parseInt(money)*parseInt($("#day").val())+parseInt($("#placeAnOrder input[name='s_money']").val());
+				} */
+				$("#chargepar").append("<option value='"+dat[i].cp_id+"' money="+money+">"+dat[i].gt_name+"网站--预计日均金额:"
+				+money+"(点击1次"+dat[i].cp_money+"元)</option>");
+			}
+		 
+		}else if(datas==2){
+			for(var i=0;i<dat.length;i++){
+				/* if ($("#day").val().length<=0) { */
+					money=parseInt(dat[i].cp_money);
+				/* }else{
+					money=parseInt(dat[i].cp_money)*parseInt($("#day").val())+parseInt($("#placeAnOrder input[name='s_money']").val());
+				} */
+				$("#chargepar").append("<option value='"+dat[i].cp_id+"' money="+money+">"+dat[i].gt_name+"网站--预计金额:"
+				+money+"(每曝光1000次收取"+money+"元)</option>");
+			}
+		}
+		if($("#day").val().length==0){
+			$("#publ").val(money);
+			$("input[name='i_money']").val($("#publ").val());
+		}else{
+			$("#publ").val(parseInt($("#chargepar option:selected").attr("money"))*parseInt($("#day").val()));
+			$("input[name='i_money']").val(parseInt(data.s_money)+parseInt($("#publ").val()));
+		}
+		
+		form.render("select");
+	});
+}
+//添加广告位类型
+function slotType(){
+	$("#slotType").append("<option value='0'>请选择：</option>");
+	$.post("jckST/slotType.do",function(data){
+		for(var i=0;i<data.length;i++){
+			$("#slotType").append("<option value="+data[i].st_id+">"+data[i].st_name+"</option>");
+		}
+		form.render("select");
+	});
+	
+}
+//添加网站
+function channel(){
+	$("#channel").append("<option value='0'>请选择：</option>");
+	$.post("jckC/channel.do",function(data){
+		for(var i=0;i<data.length;i++){
+			$("#channel").append("<option value="+data[i].ch_id+">"+data[i].ch_name+"</option>");
+		}
+		form.render("select");
+	});
+}
+//进行搜索查询
+function searchInfo(){
+	table.reload('slotShow', {
+	  where: { 
+	  	st_id:$("#slotType").val(),
+	    ch_id:$("#channel").val(),
+	    s_name: $("#sname").val() ,
+	    s_hight:$("#shight").val(),
+	    s_width:$("#swidth").val(),
+	    cs_money:$("#csmoney").val()==''?'0.0':$("#csmoney").val(),
+	    gt_pv:$("#gtpv").val(),
+	  }
+	});
+}
+
+</script>
+				
+<body>
+	<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+  <legend>范围选择</legend>
+</fieldset>
+ 
+    <div class="layui-inline" id="d">
+      <label class="layui-form-label">日期时间范围</label>
+      <div class="layui-input-inline">
+        <input type="text" class="layui-input" id="test" placeholder="~" style="width: 300px;">
+      </div>
+</div>
+	  <div id="div" hidden style="padding: 22.5px;">
+	    <button class="layui-btn layui-btn-normal layui-btn-radius" onclick="btn1()">全天(0~24)</button>
+	    <button class="layui-btn layui-btn-normal layui-btn-radius">上午(0~8)</button>
+	    <button class="layui-btn layui-btn-normal layui-btn-radius">下午(8~16)</button>
+	    <button class="layui-btn layui-btn-normal layui-btn-radius">晚上(16~24)</button>
+	  </div>
+	<input id="publ" hidden>
+	<form class="layui-form" action="jckIn/addIndent.do" style="width:80%;" id="placeAnOrder" lay-filter="fo" method="post" hidden>
+		<div class="layui-form-item">
+			<label class="layui-form-label">网站名称</label>
+			<div class="layui-input-block">
+				<input type="text" class="layui-input linksName" name="ch_name" lay-verify="required" disabled>
+			</div>
+		</div>
+		<input name="s_id" hidden>
+		<div class="layui-form-item">
+			<label class="layui-form-label">广告位名称</label>
+			<div class="layui-input-block">
+				<input type="text" name="s_name" class="layui-input linksName" lay-verify="required" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">广告位价格</label>
+			<div class="layui-input-block">
+				<input type="text" name="s_money" class="layui-input linksName" lay-verify="required" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">广告位类型</label>
+			<div class="layui-input-block">
+    				<input type="text" name="st_name" class="layui-input linksName" lay-verify="required" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">计费方式</label>
+			<div class="layui-input-block">
+				<select lay-search id="billingtype" lay-filter="formDemo">
+    		
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">收费标准</label>
+			<div class="layui-input-block">
+				<select lay-search id="chargepar"  lay-filter="formDemo2">
+    		
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">投放天数</label>
+			<div class="layui-input-block">
+				<input type="text" name="day" id="day" class="layui-input linksName" onkeyup="selectdays(this)" lay-verify="required" placeholder="请输入投放天数">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">订单金额</label>
+			<div class="layui-input-block">
+				<input type="text" name="i_money" class="layui-input linksName" lay-verify="required" placeholder="请先选择收费标准" readonly>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">广告</label>
+			<div class="layui-input-block">
+				<select lay-search id="poster" name="p_id">
+    		
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">广告地址</label>
+			<div class="layui-input-block">
+				<input type="text" name="i_formPage" class="layui-input linksUrl" lay-verify="required|url" placeholder="请输入网站地址">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit="" lay-filter="addLinks">立即提交</button>
+				<button type="button" class="layui-btn layui-btn-primary">取消</button>
+		    </div>
+		</div>
+	</form>
+ <blockquote class="layui-elem-quote news_search"><div class="demoTable">
+ 	<form class="layui-form" method="post" action="jckIn/addIndent.do">
+ 	  网站：
+    <div class="layui-inline" style="width: 110px;">
+        <select lay-search id="channel">
+    		
+		</select>
+    </div>
+      广告位类型：
+    <div class="layui-inline" style="width: 110px;">
+    	<select lay-search id="slotType" >
+    		
+		</select>
+    </div>
+ 	 广告位：
+    <div class="layui-inline">
+        <input class="layui-input" placeholder="广告位" style="width: 100px;" id="sname">
+    </div>
+    	广告位高度：
+    <div class="layui-inline">
+        <input class="layui-input" style="width: 100px;"  id="shight" placeholder="<">
+    </div>
+    广告位宽度：
+    <div class="layui-inline">
+        <input class="layui-input" style="width: 100px;" id="swidth" placeholder="<">
+    </div>
+    广告位金额：
+    <div class="layui-inline">
+        <input class="layui-input" style="width: 100px;" id="csmoney" placeholder="<">
+    </div>
+    日均访问量：
+    <div class="layui-inline">
+        <input class="layui-input" style="width: 100px;" id="gtpv" placeholder="<">
+    </div>
+    <input type="button" class="layui-btn" value="搜索" onclick="searchInfo()">
+    </form>
+</div></blockquote>
+<table class="layui-hide" id="slotShow" lay-filter="demo"></table>
+<!-- 操作广告位 -->
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">预览</a>
+  <a class="layui-btn layui-btn-xs" lay-event="order">下订单</a>
+</script>
+<div id="div1" hidden style="padding: 3px;">
+<div id="layer-photos-demo" class="layer-photos-demo">
+	<img src="" layer-src="" id="img" height="300px;" width="300px;" sid="">
+</div>
+</div>
+</body>
+</html>

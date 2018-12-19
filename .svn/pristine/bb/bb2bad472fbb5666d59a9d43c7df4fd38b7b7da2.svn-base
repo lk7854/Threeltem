@@ -1,0 +1,114 @@
+package com.aaa.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 余额变动明细
+ * 
+ * @author Administrator
+ * 
+ */
+public class MoneyChange implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Integer mc_id;
+	// 0是充值，1是续费，2是撤销，3是提现，4是金额冻结,5从冻结金额中扣费,6盈利
+	private Integer mc_type;
+	private Double mc_money;
+	private Date mc_time;
+	private Integer u_id;
+	private Integer u_id2;
+	private String mc_remark;
+
+	public Integer getU_id2() {
+		return u_id2;
+	}
+
+	public void setU_id2(Integer u_id2) {
+		this.u_id2 = u_id2;
+	}
+
+	public Integer getMc_id() {
+		return mc_id;
+	}
+
+	public void setMc_id(Integer mc_id) {
+		this.mc_id = mc_id;
+	}
+
+	public Integer getMc_type() {
+		return mc_type;
+	}
+
+	public void setMc_type(Integer mc_type) {
+		this.mc_type = mc_type;
+	}
+
+	public Double getMc_money() {
+		return mc_money;
+	}
+
+	public void setMc_money(Double mc_money) {
+		this.mc_money = mc_money;
+	}
+
+	public Date getMc_time() {
+		return mc_time;
+	}
+
+	public void setMc_time(Date mc_time) {
+		this.mc_time = mc_time;
+	}
+
+	public Integer getU_id() {
+		return u_id;
+	}
+
+	public void setU_id(Integer u_id) {
+		this.u_id = u_id;
+	}
+
+	/**
+	 * 
+	 * @param mc_id
+	 * @param mc_type变动类型
+	 * @param mc_money变动金额
+	 * @param mc_time变动时间
+	 * @param u_id出账人ID
+	 * @param u_id2入账人ID
+	 * @param mc_remark备注
+	 */
+	public MoneyChange(Integer mc_id, Integer mc_type, Double mc_money,
+			Date mc_time, Integer u_id, Integer u_id2, String mc_remark) {
+		super();
+		this.mc_id = mc_id;
+		this.mc_type = mc_type;
+		this.mc_money = mc_money;
+		this.mc_time = mc_time;
+		this.u_id = u_id;
+		this.u_id2 = u_id2;
+		this.mc_remark = mc_remark;
+	}
+
+	public String getMc_remark() {
+		return mc_remark;
+	}
+
+	public void setMc_remark(String mc_remark) {
+		this.mc_remark = mc_remark;
+	}
+
+	public MoneyChange() {
+		super();
+	}
+
+	@Override
+	public String toString() {
+		return "MoneyChange [mc_id=" + mc_id + ", mc_type=" + mc_type
+				+ ", mc_money=" + mc_money + ", mc_time=" + mc_time + ", u_id="
+				+ u_id + ", u_id2=" + u_id2 + ", mc_remark=" + mc_remark + "]";
+	}
+
+}

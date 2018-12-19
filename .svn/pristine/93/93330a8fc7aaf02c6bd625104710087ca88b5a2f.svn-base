@@ -1,0 +1,30 @@
+package com.aaa.service.tb;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aaa.dao.tb.ClickTableDao;
+import com.aaa.entity.ClickTable;
+
+@Service
+@Transactional
+public class ClickTableService {
+
+	@Autowired
+	ClickTableDao ctdao;
+
+	/**
+	 * 添加点击记录
+	 * 
+	 * @param ct
+	 * @return
+	 */
+	public Boolean addct(ClickTable ct) {
+		Integer rs = ctdao.addct(ct);
+		if (1 == rs) {
+			return true;
+		}
+		return false;
+	}
+}

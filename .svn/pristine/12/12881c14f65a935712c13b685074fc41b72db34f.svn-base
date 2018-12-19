@@ -1,0 +1,20 @@
+package com.aaa.dao.lk;
+
+import java.util.List;
+import java.util.Map;
+/**
+ * 广告位
+ * */
+import com.aaa.entity.SlotType;
+
+public interface SlotTypeDao {
+	
+	public List<Map<String, Object>> querySlotType();
+	
+	public int addSlotType(SlotType st);
+
+	public int updateSlotType(SlotType st);
+
+	public int deleteSlotType(Integer[] st_ids);
+
+}

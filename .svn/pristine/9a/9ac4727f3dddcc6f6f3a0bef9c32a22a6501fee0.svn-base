@@ -1,0 +1,53 @@
+package com.aaa.controller.lk;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.aaa.entity.Slot;
+import com.aaa.service.lk.SlotlService;
+
+/**
+ * @author Despacito
+ * @see 
+ * */
+@Controller
+@RequestMapping("LKslot")
+public class SlotlController {
+	
+	@Autowired
+	private SlotlService sService;
+	
+	@RequestMapping("qs")
+	@ResponseBody
+	public List<Map<String, Object>> querySlot(){
+		return sService.querySlot();
+	}
+	
+	@RequestMapping("adds")
+	@ResponseBody
+	public boolean addSlot(Slot s){
+		System.out.println(s);
+		return sService.addSlot(s);
+	}
+	
+	@RequestMapping("ups")
+	@ResponseBody
+	public boolean updateSlot(Slot s){
+		System.out.println(s);
+		return sService.updateSlot(s);
+	}
+	
+	@RequestMapping("dels")
+	@ResponseBody
+	public boolean deleteSlot(Integer[] s_ids){
+		for (Integer id : s_ids) {
+			System.out.println(id);
+		}
+		return sService.deleteSlot(s_ids);
+	}
+}

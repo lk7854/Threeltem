@@ -1,0 +1,15 @@
+package com.aaa.dao.jck;
+
+import java.util.List;
+import java.util.Map;
+
+import com.aaa.entity.Channel;
+import com.aaa.entity.Slot;
+
+public interface JckSlotDao {
+
+	//查看广告位信息
+	public List<Map<String, Object>> selSlot(Slot s,Channel c,Integer page,Integer limit);
+	//修改广告位的部分信息
+	public int updateSlot(Slot s);
+}

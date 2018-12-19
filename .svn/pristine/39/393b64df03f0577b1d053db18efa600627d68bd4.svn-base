@@ -1,0 +1,49 @@
+package com.aaa.service.lk;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.aaa.dao.lk.PosterTypeDao;
+import com.aaa.entity.PosterType;
+
+@Service
+public class PosterTypeService {
+	
+	@Autowired
+	PosterTypeDao ptDao;
+	
+	public List<Map<String, Object>> queryPosterType(){
+		return ptDao.queryPosterType();
+	}
+	
+	public boolean addPosterType(PosterType pt){
+		int i = ptDao.addPosterType(pt);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean updatePosterType(PosterType pt){
+		int i = ptDao.updatePosterType(pt);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean deletePosterType(Integer[] pt_ids){
+			int rs = ptDao.deletePosterType(pt_ids);
+			if (rs != 0) {
+				return true;// 删除成功
+			} else {
+				return false;// 删除失败
+			}
+	}
+
+}

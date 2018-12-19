@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.JckSlotDao">
+	<select id="selSlot" resultType="Map">
+		SELECT *,getSTname(s.st_id) st_name,getUname(s.u_id) uname,getGTname(ch.gt_id) gtname FROM slot s  LEFT JOIN channel ch ON 
+ch.ch_id=s.ch_id
+	<where>
+		<if test="null!=param1">
+			<if test="null!=param1.s_name and ''!=param1.s_name">
+				and s.s_name like concat('%',#{param1.s_name},'%')
+			</if>
+			<if test="null!=param1.s_hight">
+				and s.s_hight&lt;#{param1.s_hight}
+			</if>
+			<if test="null!=param1.s_width">
+				and s.s_width&lt;#{param1.s_width}
+			</if>
+			<if test="null!=param1.st_id and 0!=param1.st_id">
+				and s.st_id=#{param1.st_id}
+			</if>
+			<if test="null!=param1.s_money and 0.0!=param1.s_money">
+				and s.s_money&lt;#{param1.s_money}
+			</if>
+			<if test="null!=param1.s_state">
+				and	s.s_state=#{param1.s_state}
+			</if>
+		</if>
+		<if test="null!=param2">
+			<if test="null!=param2.ch_id and 0!=param2.ch_id">
+				and ch.ch_id=#{param2.ch_id}
+			</if>
+			<if test="null!=param2.gt_pv and ''!=param2.gt_pv">
+				and ch.gt_pv&lt;#{param2.gt_pv}
+			</if>
+		</if>
+	</where>
+	<if test="null!=param3 and null!=param4">
+		 limit #{param3},#{param4}
+	</if>
+	</select>
+	<!-- public int updateSlot(Slot s); -->
+	<update id="updateSlot" parameterType="Slot">
+		update slot 
+			<trim prefix="set" prefixOverrides=",">
+				<if test="null!=s_name and ''!=s_name">
+					,s_name=#{s_name}
+				</if>
+				<if test="null!=st_id">
+					,st_id=#{st_id}
+				</if>
+				<if test="null!=s_hight">
+					,s_hight=#{s_hight}
+				</if>
+				<if test="null!=s_picture and ''!=s_picture">
+					,s_picture=#{s_picture}
+				</if>
+				<if test="null!=s_state">
+					,s_state=#{s_state}
+				</if>
+				<if test="null!=s_updatetime and ''!=s_updatetime">
+					,s_updatetime=#{s_updatetime}
+				</if>
+				<if test="null!=s_remark and ''!=s_remark">
+					,s_remark=#{s_remark}
+				</if>
+				<if test="null!=s_clickcount and ''!=s_clickcount">
+					,s_clickcount=#{s_clickcount}
+				</if>
+				<if test="null!=upu_id">
+					,upu_id=#{upu_id}
+				</if>
+				<if test="null!=s_money">
+					,s_money=#{s_money}
+				</if>
+				<if test="null!=ch_id">
+					,ch_id=#{ch_id}
+				</if>
+				<if test="null!=s_oldPrice">
+					,s_oldPrice=#{s_oldPrice}
+				</if>
+			</trim>
+			where s_id=#{s_id}
+	</update>
+</mapper>

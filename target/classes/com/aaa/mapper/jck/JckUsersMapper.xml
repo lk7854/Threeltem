@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.JckusersDao">
+	<select id="showMyselfInfo" parameterType="Integer" resultType="Map">
+		SELECT u.u_id,u_name,u_state,i.in_id,in_name,in_address,in_man,in_state,in_remark,getUserName(u.user_id)
+		 uname,in_phone FROM USERS u LEFT JOIN institution i ON i.in_id=u.in_id where u.u_id=#{_parameter}
+	</select>
+	<update id="updateMyselfInfo">
+		UPDATE USERS set u_name=#{u_name} WHERE u_id=#{u_id}
+	</update>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.JckChannelDao">
+	<select id="selChannel" resultType="Map">
+		select * from channel 
+		<where>
+			<if test="null!=ch_id">
+				and ch_id=#{ch_id}
+			</if>
+			<if test="null!=ch_name">
+				and ch_name=#{ch_name}
+			</if>
+			<if test="null!=ch_state">
+				and ch_state=#{ch_state}
+			</if>
+			<if test="null!=u_id">
+				and u_id=#{u_id}
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,47 @@
+package com.aaa.service.jck;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aaa.dao.jck.JckSlotDao;
+import com.aaa.entity.Channel;
+import com.aaa.entity.Slot;
+@Service
+@Transactional
+public class JckSlotService {
+
+	@Autowired
+	JckSlotDao jsd;
+	//显示广告位相关信息
+	public List<Map<String, Object>> selSlot(Slot s,Channel c,Integer page,Integer limit){
+		if (null!=s) {
+			if (null!=s.getS_state()&&-1==s.getS_state()) {
+				s.setS_state(null);
+			}
+			if (null!=s.getS_name()) {
+				try {
+					s.setS_name(new String(s.getS_name().getBytes("iso8859-1"),"utf-8"));
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		if (page==-1&&limit==-1) {
+			page=null;
+			limit=null;
+		}else {
+			page=(page-1)*limit;
+		}
+		
+		return jsd.selSlot(s,c,page,limit);
+	}
+	public int updateSlot(Slot s){
+		return jsd.updateSlot(s);
+	}
+}

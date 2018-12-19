@@ -1,0 +1,211 @@
+package com.aaa.service.tb;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aaa.dao.tb.AccBDao;
+import com.aaa.dao.tb.ClickTableDao;
+import com.aaa.dao.tb.IndentCheckDao;
+import com.aaa.dao.tb.IndentDao;
+import com.aaa.dao.tb.MoneyChangeDaoTB;
+import com.aaa.entity.AccountBalance;
+import com.aaa.entity.ClickTable;
+import com.aaa.entity.Indent;
+import com.aaa.entity.IndentCheck;
+import com.aaa.entity.Information;
+import com.aaa.entity.LayuiQuery;
+import com.aaa.entity.MoneyChange;
+import com.aaa.util.tb.help.Tools;
+
+@Service
+@Transactional
+public class IndentService {
+
+	@Autowired
+	IndentDao idao;
+	@Autowired
+	IndentCheckDao isdao;
+	@Autowired
+	InformationService is;
+	@Autowired
+	AccBDao abdao;
+
+	@Autowired
+	MoneyChangeDaoTB mcdao;
+	@Autowired
+	ClickTableDao ctdao;
+
+	/**
+	 * 网站主获取网站信息
+	 * 
+	 * @param i_id
+	 * @return
+	 */
+	public Object getOders(String i_id, HttpSession session) {
+		// 获取登录人的ch_id
+		@SuppressWarnings("unchecked")
+		Map<String, Object> map = (Map<String, Object>) session
+				.getAttribute("login");
+		// 根据订单ID查询订单信息
+		Indent indent = new Indent();
+		indent.setI_id(i_id);
+		@SuppressWarnings("unchecked")
+		List<Map<String, Object>> list = (List<Map<String, Object>>) this
+				.select(indent, null, null, Tools.toInteger(map.get("u_id")))
+				.getData();
+		if (0 == list.size()) {
+			return "您输入的订单不存在!";
+		}
+		return list;
+	}
+
+	/**
+	 * 撤销订单
+	 * 
+	 * @param indent
+	 * @param bt_name
+	 * @param cp_money
+	 * @return
+	 */
+	public Boolean query(Indent indent, String bt_name, Integer cp_money) {
+		// 判断订单的计费方式
+		// 根据订单编号获取，这个订单的广告在执行中的点击量
+
+		if (bt_name.equals("单次点击")) {
+
+			// 计算总得应扣的金额
+		} else if (bt_name.equals("千次曝光")) {
+			// 计算总得应扣的金额
+		}
+
+		// 扣除广告位的所有金额，根据计费方式的收费标准和点击量从冻结金额中扣除费用
+		// 修改订单状态
+		return null;
+	}
+
+	/**
+	 * 分页条件查询订单
+	 * 
+	 * @param ident
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	public LayuiQuery select(Indent ident, Integer page, Integer limit,
+			Integer inst_uid) {
+		Integer offset = 0;
+		if (null == page && null == limit) {
+			limit = 10;
+		} else {
+			offset = (page - 1) * limit;
+		}
+		// 判断，条件为空时查询全部
+		if ("" == ident.getI_id())
+			ident.setI_id(null);
+		// 判断状态码-1时查询所有订单
+		if (null != ident.getI_state() && -1 == ident.getI_state())
+			ident.setI_state(null);
+		List<Map<String, Object>> list = idao.select(ident, offset, limit,
+				inst_uid);
+		Integer count = idao.select(ident, null, null, inst_uid).size();
+		LayuiQuery lq = new LayuiQuery();
+		lq.setCode(0);
+		lq.setCount(count);
+		lq.setData(list);
+		return lq;
+	}
+
+	/**
+	 * 修改订单信息，网站主投放完广告修改订单状态
+	 * 
+	 * @param indent
+	 * @param session
+	 * @return
+	 */
+	public Boolean update(Indent indent, HttpSession session) {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> map = (Map<String, Object>) session
+				.getAttribute("login");
+		indent.setU_id(Tools.toInteger(map.get("u_id")));// 审核人
+		Integer rs = idao.checkIndent(indent);
+		if (1 == rs) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 审核
+	 * 
+	 * @param indent
+	 * @return
+	 */
+	public Boolean check(Indent indent, IndentCheck is, HttpSession session) {
+		@SuppressWarnings("unchecked")
+		// 获取登录人的信息
+		Map<String, Object> map = (Map<String, Object>) session
+				.getAttribute("login");
+		// 设置其他信息
+		is.setIc_result(indent.getI_state());// 审核结果
+		is.setU_id(Tools.toInteger(map.get("u_id")));// 审核人
+		// 冻结金额
+		AccountBalance ab = new AccountBalance();
+		// 冻结人
+		ab.setU_id(indent.getU_id());
+		// 计算冻结后的金额
+		Map<String, Object> users = abdao.queryAcbyUid(indent.getU_id());
+		Double newmoney = Tools.toDouble(users.get("ab_money"));// 当前金额
+		Double dingdanjine = indent.getI_money();
+		Double money = newmoney - dingdanjine;// 当前金额减去订单金额
+		Double dongjie = Tools.toDouble(users.get("ab_freezeMoney"));// 之前的冻结金额
+		// 冻结后的金额,当前订单应冻结的金额+之前账户冻结的金额
+		ab.setAb_freezeMoney(dongjie + dingdanjine);// 当前订单要冻结的金额+之前账户的冻结金额
+		ab.setAb_money(money);// 剩下的金额
+		// 修改金额表信息
+		Integer abrs = abdao.accbUp(ab);
+		// 添加金额变动记录
+		MoneyChange mc = new MoneyChange();
+		// 变动人
+		mc.setU_id(indent.getU_id());
+		// 变动金额
+		mc.setMc_money(dingdanjine);
+		// 变动类型，订单菜单
+		mc.setMc_type(4);
+		// 变动备注
+		mc.setMc_remark("订单扣款！");
+		// 添加变动记录
+		Integer mcrs = mcdao.addMc(mc);
+		// 添加审核记录
+		Integer isrs = isdao.addRecord(is);
+		// 修改状态
+		// 先清空备注，防止备注被改
+		indent.setI_remark(null);
+		Integer rs = idao.checkIndent(indent);
+		// 添加点击表的，该订单广告的点击记录
+		ClickTable ct = new ClickTable(null, indent.getI_id(), null);
+		Integer addctRs = ctdao.addct(ct);
+		// 发送消息通知
+		Information info = new Information();
+		info.setMt_id(3);// 消息类型-订单审核
+		// 判断审核结果根据结果，设定消息内容
+		if (indent.getI_state() == 2) {
+			// 未通过
+			info.setInf_content("订单编号为：" + indent.getI_id()
+					+ "的审核结果：未通过；<br>原因：" + indent.getI_remark());
+		} else if (indent.getI_state() == 4) {
+			// 通过
+			info.setInf_content("订单编号为：" + indent.getI_id()
+					+ "的审核结果：通过,正在等待投放；<br>审核员备注：" + indent.getI_remark());
+		}
+		if (abrs == 1 && isrs > 0 && rs > 0 && addctRs == 1 && mcrs == 1) {
+			return true;
+		}
+		return false;
+	}
+}

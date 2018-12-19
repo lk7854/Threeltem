@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.lk.SlotTypeDao">
+
+	<select id="querySlotType" resultType="Map">
+		select st.st_id,st.st_name,st.st_addtime,st.st_updatetime,
+		st.st_remark
+		from slottype st
+	</select>
+	
+	<insert id="addSlotType" parameterType="SlotType">
+		<selectKey keyColumn="st_id" keyProperty="st_id" order="BEFORE" resultType="Integer">
+			select MAX(st_id)+1 from slottype
+		</selectKey>
+			insert into slottype(st_id,st_name,st_addtime,
+			st_updatetime,st_remark) 
+			values
+			(#{st_id},#{st_name},NOW(),NOW(),#{st_remark})
+	</insert>
+	
+	<update id="updateSlotType" parameterType="SlotType">
+		update slottype
+		<choose>
+				<when test="st_id == null">
+					<set>
+						st_id = -1
+					</set>
+				</when>
+				<otherwise>
+					<set>
+						<if test="st_name != null">
+							st_name = #{st_name},
+						</if>
+						<if test="st_updatetime != null">
+							st_updatetime = NOW(),
+						</if>
+						<if test="st_remark != null">
+							st_remark = #{st_remark},
+						</if>
+					</set>
+				</otherwise>
+			</choose>
+		<where> 
+			<choose>
+				<when test="st_id == null">
+					st_id=-1
+				</when>
+				<otherwise>
+					st_id=#{st_id}
+				</otherwise>
+			</choose>
+		</where>
+	</update>
+	
+	<delete id="deleteSlotType" parameterType="Integer">
+		delete from slottype where st_id in(-1
+		<foreach collection="array" index="index" item="st_id" open="," separator=",">
+			#{st_id}
+		</foreach>
+		)
+	</delete>
+	
+</mapper>

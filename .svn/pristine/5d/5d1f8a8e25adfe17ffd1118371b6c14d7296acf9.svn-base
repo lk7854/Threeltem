@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.lk.ParentDao">
+
+	<!-- 菜单栏 -->
+	
+	<select id="queryByParentm_id" resultType="Map">
+		SELECT m_id id,m_name title,m_url href,m_icon icon FROM menus 
+		where 1=1 
+		<if test="param1 != null">
+		and m_id in (select m_id from role_menu where r_id = #{param1}) 
+		</if>
+		and m_parentid = #{param2}
+	</select>
+	
+	<!-- 中间表 -->
+	<select id="queryBym_id" parameterType="integer" resultType="integer">
+		select m_id from role_menu where r_id = #{r_id};
+	</select>
+	
+	<insert id="addrole_menu" >
+  		insert into role_menu values(#{0},#{1})
+  	</insert>
+  	
+  	<delete id="deleterole_menu">
+		delete from role_menu where r_id = #{r_id}
+	</delete>
+
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.lk.PosterTypeDao">
+
+	<select id="queryPosterType" resultType="Map">
+		select pt.pt_id,pt.pt_name,pt.u_id,pt.pt_updateTime,pt.upu_id,
+		u.u_id,u.u_name,u.u_pwd,u.user_id,u.u_state,u.in_id,
+		u.r_id,u.u_addtime,u.u_updatetime
+		from postertype pt
+		left join users u on u.u_id=pt.u_id 
+		<where>
+			<if test="null!=param1">
+				<if test="null!=param1.pt_name">
+			 		and pt_name like concat('%',#{param1.pt_name},'%')
+			 	</if>
+			</if>
+		</where>
+		<if test="null!=param2 and null!=param3">
+		 limit #{param2},#{param3}
+		</if>
+	</select>
+	
+	<select id="listPoster" resultType="Map">
+		select * from poster where pt_id in(-1
+		<foreach collection="array" index="index" item="pt_id" open="," separator=",">
+			#{pt_id}
+		</foreach>
+		)
+	</select>
+	
+	<insert id="addPosterType" parameterType="PosterType">
+		<selectKey keyColumn="pt_id" keyProperty="pt_id" order="BEFORE" resultType="Integer">
+			select MAX(pt_id)+1 from postertype
+		</selectKey>
+			insert into postertype(pt_id,pt_name,u_id,pt_updateTime,
+			upu_id) 
+			values
+			(#{pt_id},#{pt_name},#{u_id},NOW(),#{upu_id})
+	</insert>
+	
+	<update id="updatePosterType" parameterType="PosterType">
+		update postertype
+		<choose>
+				<when test="pt_id == null">
+					<set>
+						pt_id = -1
+					</set>
+				</when>
+				<otherwise>
+					<set>
+						<if test="pt_name != null">
+							pt_name = #{pt_name},
+						</if>
+						<if test="u_id != null">
+							u_id = #{u_id},
+						</if>
+						<if test="pt_updateTime != null">
+							pt_updateTime = NOW(),
+						</if>
+						<if test="upu_id != null">
+							upu_id = #{upu_id},
+						</if>
+					</set>
+				</otherwise>
+			</choose>
+		<where> 
+			<choose>
+				<when test="pt_id == null">
+					pt_id=-1
+				</when>
+				<otherwise>
+					pt_id=#{pt_id}
+				</otherwise>
+			</choose>
+		</where>
+	</update>
+	
+	<delete id="deletePosterType" parameterType="Integer">
+		delete from postertype where pt_id in(-1
+		<foreach collection="array" index="index" item="pt_id" open="," separator=",">
+			#{pt_id}
+		</foreach>
+		)
+	</delete>
+	
+</mapper>

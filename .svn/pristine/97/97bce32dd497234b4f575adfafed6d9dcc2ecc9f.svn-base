@@ -1,0 +1,49 @@
+package com.aaa.service.lk;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.aaa.dao.lk.ChannelDao;
+import com.aaa.entity.Channel;
+
+@Service
+public class ChannelService {
+	
+	@Autowired
+	ChannelDao chDao;
+	
+	public List<Map<String, Object>> queryChannel(){
+		return chDao.queryChannel();
+	}
+	
+	public boolean addChannel(Channel ch){
+		int i = chDao.addChannel(ch);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean updateChannel(Channel ch){
+		int i = chDao.updateChannel(ch);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean deleteChannel(Integer[] ch_ids){
+			int rs = chDao.deleteChannel(ch_ids);
+			if (rs != 0) {
+				return true;// 删除成功
+			} else {
+				return false;// 删除失败
+			}
+	}
+
+}

@@ -1,0 +1,280 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <base href="<%=basePath%>">
+    
+    <title></title>
+    
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<!-- <link rel="stylesheet" href="css/font_eolqem241z66flxr.css" media="all" />
+	<link rel="stylesheet" href="css/news.css" media="all" /> -->
+	<!-- <script type="text/javascript" src="js/jquery-3.1.1.js"></script> -->
+	<link rel="stylesheet" href="layui-v2.3.0/layui/css/layui.css" media="all" />
+	<script type="text/javascript" src="layui-v2.3.0/layui/layui.js"></script>
+	<script type="text/javascript">
+		var $ = null;
+		var table = null;
+		var layer = null;
+		var form = null;
+		var treload = null;
+		
+		layui.use(['layer','table','form'],function(){
+			$ = layui.jquery;
+			table = layui.table;//获取layui的表格对象
+			layer = layui.layer;
+			form = layui.form;
+			layer.msg('Hello World');//弹出框
+			
+			//执行一个table示例
+			treload = table.render({
+				elem:"#tb",
+				url:"inst/instQuery.do",
+				cellMinWidth:true,
+				page:true,
+				cols:[[
+					{field:"in_id",title:"编号",sort:true,width:100,fiexed:"left",align:"center"},
+					{field:"in_name",title:"机构名",sort:true,align:"center"},
+					{field:"in_phone",title:"机构电话",sort:true,align:"center"},
+					{field:"in_addtime",title:"提交时间",sort:true,align:"center"},
+					{field:"in_state",title:"状态",sort:true,width:80,align:"center",templet:function(d){
+						if(d.in_state==0){return "<i style='color:red'>待审核</i>";}
+						if(d.in_state==1){return "<i style='color:black'>未通过</i>";}
+						if(d.in_state==2){return "<i style='color:blue'>通过</i>";}
+					}},
+					{field:"u_name",title:"所属账号",width:105,align:"center"},
+					{field:"in_updatetime",title:"修改时间",sort:true,align:"center"},
+					{field:"",title:"操作",align:"center",width:150,toolbar:"#tool",fixed:"right"},
+				]],
+			});
+			
+			
+			table.on('tool(table)',function(obj){
+				//获取点击行的数据
+				var clickdata = obj.data;
+				//获取点击的元素的lay-event属性值
+				var clickevent = obj.event;
+				//判断
+				if(clickevent == "detail"){
+					//即查看详情,,进行操作
+					//alert("查看详情="+JSON.stringify(clickdata));
+					//填充数据，并打开详情窗口
+					showWinDetails(clickdata);
+				}
+				if(clickevent == "check"){//审核
+					if(clickdata.in_state==0){
+						showWin(clickdata);
+					} else {
+						layer.msg("不能重复审核",{icon:5});
+					}
+				}
+			});
+			//监听下拉列表
+			form.on("select(selectstate)",function(data){
+				query();
+			});
+		});
+		
+		//审核订单
+		function showWin(data){
+			//渲染表单数据
+			form.val("fm",data);
+			//打开窗口
+			var index = layer.open({
+				title:"订单详情",
+				type:1,
+				icon:6,
+				shadeClose:true,//点击遮罩层关闭弹窗
+				anim:4,//弹出动画
+				content:$('#content'),
+				area: ['500px', '470px'],//宽高
+				btn:['通过','驳回','取消'],
+				btnAlign:'c',
+				yes:function(){
+					checkindent(index,2);//通过
+				},
+				btn2:function(){
+					checkindent(index,1);//驳回
+					return false;
+				}
+			});
+		}
+		
+		//详情窗口
+		function showWinDetails(data){
+			form.val("fm",data);
+			//打开窗口
+			layer.open({
+				title:"订单详情",
+				type:1,
+				icon:6,
+				shadeClose:true,//点击遮罩层关闭弹窗
+				anim:4,//弹出动画
+				content:$('#content'),
+				area: ['500px', '430px']//宽高
+			});
+		}
+		
+		//审核订单，返回审核备注信息
+		function checkindent(openindex,statecode){
+			var remark = "";
+			//输入层
+			layer.prompt({
+				formType:2,//输入框类型，支持0（文本）默认1（密码）2（多行文本）
+				value:"",
+				title:"审核备注(可以为空)",
+				area:['200px','150px']
+			},function(value,index){
+				remark = value;
+				layer.close(index);//关闭输入层
+				var title = "";
+				if(statecode == 2){title="通过";}
+				if(statecode == 1){title="驳回";}
+				layer.confirm("是否"+title+"?",{icon:3,title:"审核提示"},function(i){
+					//提交数据
+					var in_id = $("#id").val();//机构编号
+					var in_name = $("#in_name").val();
+					$.post("inst/check.do",{
+						"in_id":in_id,
+						"in_state":statecode,
+						"in_remark":remark,
+						"in_name":in_name
+					},function(data){
+						if(data){
+							layer.msg("操作成功！",{icon:1});
+							treload.reload();
+						} else {
+							layer.msg("操作失败！",{icon:5});
+						}
+					});
+					layer.close(i);//关闭确认通过窗口
+					layer.close(openindex);//关闭open窗口
+				});
+			});
+		}
+		//根据编号,和广告名查询订单
+		function query(){
+			var name = $("#query_in_name").val();
+			var state = $("#query_in_state").val();
+			treload.reload({
+				page: {
+		          	curr: 1, //重新从第 1 页开始
+		        },
+		        method:"post",
+				where:{
+					in_name:name,
+					in_state:state,
+				}
+			});
+		}
+		function show1(id){
+			var url = $("#"+id).val();
+			var json= 
+			{
+			  "title": "标题", //相册标题
+			  "id": 123, //相册id
+			  "start": 0, //初始显示的图片序号，默认0
+			  "data": [   //相册包含的图片，数组格式
+			  {
+			   "alt": "图片名",
+			   "pid": 666, //图片id
+			   "src": url, //原图地址
+			   "thumb": url //缩略图地址
+			  }
+			]};
+			
+			layer.photos({
+				photos:json,
+				shift:5
+			});
+		}
+	</script>
+  </head>
+  
+  <body>
+  	<blockquote class="layui-elem-quote news_search" style="margin-left:10px;margin-top:10px;">
+		<div class="layui-inline">
+			<form class="layui-form" >
+				<label class="layui-form-label">条件：</label>
+				<div class="layui-input-inline" style="width:200px;">
+			    	<select id="query_in_state" lay-filter="selectstate">
+				      	<option value="-1">所有</option>
+				      	<option value="0">待审核</option>
+				      	<option value="1">未通过</option>
+				      	<option value="2">通过</option>
+				    </select>
+			    </div>
+			    <div class="layui-input-inline">
+			    	<input type="text" placeholder="机构名" id="query_in_name" class="layui-input search_input">
+			    </div>
+			    <a id="select" onclick="query()" class="layui-btn layui-btn-radius layui-btn-normal">查询</a>
+			    <div class="layui-inline">
+					<div class="layui-form-mid layui-word-aux">审核需谨慎</div>
+				</div>
+		    </form>
+		</div>
+	</blockquote>
+	<!-- 数据表格 -->
+    <table id="tb" lay-filter="table"></table>
+    <!-- 工具栏 -->
+    <script type="text/html" id="tool">
+		<a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-normal" lay-event="detail">详情</a>
+		<a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-danger" lay-event="check">审核</a>
+	</script>
+	<!-- 详情框 -->
+    <div hidden id="content">
+    	<form id="fm" method="post" style="width:100%; margin-top:5px;" lay-filter="fm" class="layui-form">
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">编号</label>
+			    <div class="layui-input-block">
+			      <input readonly="readonly" style="width:330px;" id="id" name="in_id" required  lay-verify="required" class="layui-input">
+			    </div>
+			 </div>
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">机构名</label>
+			    <div class="layui-input-block" style="width:330px;">
+				    <input type="text" id="in_name" name="in_name" style="width:330px;" required  lay-verify="required" class="layui-input">
+			    </div>
+			 </div>
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">地址</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="in_address" style="width:330px;" required  lay-verify="required" class="layui-input">
+			    </div>
+			</div>
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">联系人</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="in_man" style="width:330px;" required  lay-verify="required" class="layui-input">
+			    </div>
+			</div>
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">联系电话</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="in_phone" style="width:330px;" required  lay-verify="required" class="layui-input">
+			    </div>
+			</div>
+    		<div class="layui-form-item">
+			    <label class="layui-form-label">备注</label>
+			    <div class="layui-input-block">
+			      <input type="text" name="in_remark" style="width:330px;" required  lay-verify="required" class="layui-input">
+			    </div>
+			</div>
+			<input type="text" hidden id="img1" name="in_certificate">
+    	</form>
+    	<label class="layui-form-label">预览</label>
+    	<div class="layui-btn-group " style="width:70%;text-align: left;">
+			<a class="layui-btn" onclick="show1('img1')">营业执照</a>
+		</div>
+    </div>
+  </body>
+</html>

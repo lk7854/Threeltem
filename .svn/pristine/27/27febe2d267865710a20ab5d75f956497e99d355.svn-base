@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.MoneyChangeDaoTB">
+	<insert id="addMc" parameterType="MoneyChange">
+		insert into MoneyChange(mc_type,mc_money,
+			mc_time,u_id,u_id2,mc_remark
+		) values (#{mc_type},#{mc_money},now(),#{u_id},#{u_id2},#{mc_remark})
+	</insert>
+	
+	<select id="queryMc" resultType="Map">
+		SELECT * FROM moneychange 
+		<where>
+			<if test="null!=param1">
+				<if test="null!=param1.u_id">
+					and u_id = #{param1.u_id}
+				</if>
+				<if test="null!=param1.u_id2">
+					and u_id2 = #{param1.u_id2}
+				</if>
+				<if test="null!=param1.mc_type">
+					and mc_type=#{param1.mc_type}
+				</if>
+			</if>
+			<if test="null!=param2 and null!=param3 and param2!=param3">
+					and date(mc_time)>=date(#{param2})
+					and date(#{param3})>=date(mc_time)
+			</if>
+			
+		</where>
+		<if test="null!=param4 and null!=param4">
+			limit #{param4},#{param5}
+		</if>	
+	</select>
+	
+</mapper>

@@ -1,0 +1,40 @@
+package com.aaa.controller.tb;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.aaa.entity.Information;
+import com.aaa.service.tb.InformationService;
+
+/**
+ * 添加消息通知
+ * 
+ * @author Administrator
+ * 
+ */
+@Controller
+@RequestMapping("info")
+public class InformationController {
+	@Autowired
+	InformationService is;
+
+	/**
+	 * 发送消息通知
+	 * 
+	 * @param info
+	 * @return
+	 */
+	@RequestMapping("addInfo")
+	@ResponseBody
+	public Boolean send(Information info) {
+		Integer rs = is.addInfo(info);
+		info.setMt_id(7);// 设置消息类型
+		if (rs == 1) {
+			return true;
+		}
+		return false;
+	}
+
+}

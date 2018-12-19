@@ -1,0 +1,32 @@
+package com.aaa.aop;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
+@Aspect
+@Component
+public class ExAop {
+
+	@Around(value = "execution(public * com.aaa.service.*.*.*(..))")
+	public Object around(ProceedingJoinPoint pjp) {
+		Object rs = true;
+		try {
+			System.out.println("开始环绕");
+			rs = pjp.proceed();
+		} catch (Exception e) {
+			rs = false;
+			TransactionAspectSupport.currentTransactionStatus()
+					.setRollbackOnly();
+			e.printStackTrace();
+		} catch (Throwable e) {
+			rs = false;
+			e.printStackTrace();
+
+		}
+		return rs;
+	}
+
+}

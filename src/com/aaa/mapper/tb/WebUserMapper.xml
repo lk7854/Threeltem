@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.WebUserDao">
+	<select id="getTableDate" parameterType="Integer" resultType="Map">
+		SELECT SUM(mc_money) count,MONTH(mc_time) month,getIn_name(#{0}) inname FROM  moneychange 
+		WHERE u_id2 IN (SELECT u_id FROM users WHERE r_id = 4) 
+		AND mc_type =7 AND YEAR(mc_time) = YEAR(NOW())  AND u_id2 = #{0}
+		GROUP BY MONTH(mc_time) ORDER BY MONTH(mc_time)
+	</select>
+	
+	<select id="query" resultType="Map">
+		SELECT * FROM users u,institution inst WHERE u.u_id = inst.u_id 
+		and u.r_id = 4 and inst.in_state = 2
+		<if test="null!=param1">
+			<if test="null!=param1.u_id">
+				and u.u_id=#{param1.u_id}
+			</if>
+			<if test="null!=param1.u_name">
+				and inst.in_name like concat('%',#{param1.u_name},'%')
+			</if>
+		</if>
+		<if test="null!=param2 and null!=param3">
+			limit #{param2},#{param3}
+		</if>
+	</select>
+	
+</mapper>

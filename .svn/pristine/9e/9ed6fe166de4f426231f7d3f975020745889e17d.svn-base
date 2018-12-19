@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.JckIndentDao">
+	<insert id="AddIndent">
+		insert into indent(i_id,p_id,u_id,i_state,i_startTime,i_endTime,i_addTime,i_remark,i_formPage,s_id,i_money,upu_id,cp_id)
+		 values(#{param1.i_id},#{param1.p_id},<!-- #{param1.u_id} -->2,0,date_sub(now(), interval -3 hour),ADDDATE(date_sub(now()
+		 ,interval -3 hour),#{param2}),now(),#{param1.i_remark},#{param1.i_formPage},#{param1.s_id},#{param1.i_money},
+		 #{param1.upu_id},#{param1.cp_id})
+	</insert>
+	<select id="selIndents" resultType="Map">
+		SELECT *,getUname(i.u_id) uname,getUname(i.upu_id) upname,getPTname(p.pt_id) pt_name,
+		getSTname(s.st_id) st_name FROM indent i inner join poster p on p.p_id=i.p_id inner join
+		 slot s on s.s_id=i.s_id left join feedback f on f.i_id=i.i_id
+		 <where>
+		 	 <if test="param1!=null">
+			 	<if test="null!=param1.i_id">
+			 		 and i.i_id=#{param1.i_id}
+			 	</if>
+			 	<if test="null!=param1.i_state">
+			 		and i.i_state=#{param1.i_state}
+			 	</if>
+			 	<if test="null!=param1.p_id">
+			 		and i.p_id=#{param1.p_id}
+			 	</if>
+			 </if>
+			 <if test="null!=param4">
+			 	<if test="null!=param4.f_state">
+			 		and f.f_state=#{param4.f_state}
+			 	</if>
+			 </if>
+		 </where>
+			order by i.i_id desc
+			<if test="param2!=null and param3!=null">
+				 limit #{param2},#{param3}
+			</if>
+		
+	</select>
+</mapper>

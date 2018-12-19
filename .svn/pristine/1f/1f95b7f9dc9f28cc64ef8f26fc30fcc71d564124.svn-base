@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.FrozenAssetsDao">
+	<insert id="addFrozenAssets" parameterType="FrozenAssets">
+		insert into FrozenAssets(i_id,frozenMoney,addTime,upTime) 
+		values(#{i_id},#{frozenMoney},now(),now())
+	</insert>
+	
+	<select id="querFrozenMoneyByi_id" parameterType="String" resultType="FrozenAssets">
+		select i_id,frozenMoney,addTime,upTime form FrozenAssets where i_id = #{0}
+	</select>
+	
+	<select id="getSumForzenMoneyByu_id" parameterType="Integer" resultType="Double">
+		SELECT SUM(frozenMoney) sumFrozenMoney  FROM users u,indent i,frozenassets fa 
+		WHERE u.u_id = i.u_id AND i.i_id = fa.i_id and u.u_id=#{0}
+	</select>
+	
+	<update id="update" parameterType="FrozenAssets">
+		update FrozenAssets set frozenMoney = #{frozenMoney},upTime = now()
+		where i_id = #{i_id}
+	</update>
+	
+	
+</mapper>

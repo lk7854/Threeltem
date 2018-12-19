@@ -1,0 +1,21 @@
+package com.aaa.dao.tb;
+
+import com.aaa.entity.SlotCheck;
+
+/**
+ * 广告位审核表接口
+ * 
+ * @author Administrator
+ * 
+ */
+public interface SlotDao {
+	/**
+	 * 添加广告位的审核记录
+	 * 
+	 * @param sc
+	 *            广告位审核记录
+	 * @return
+	 */
+	public Integer addSlotCheck(SlotCheck sc);
+
+}

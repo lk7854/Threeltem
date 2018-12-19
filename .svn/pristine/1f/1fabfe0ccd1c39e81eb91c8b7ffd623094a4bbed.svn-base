@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.InformationDao">
+	<insert id="addInfo" parameterType="Information">
+		insert into Information(inf_content,mt_id,inf_time,u_id
+		) values(#{inf_content},#{mt_id},now(),#{u_id})
+	</insert>
+	
+	<select id="query" resultType="Map">
+		SELECT * FROM information i,msgtype mt WHERE i.mt_id = mt.mt_id
+		<if test="null!=param1">
+			<if test="null!=param1.u_id">
+				and i.u_id = #{param1.u_id}
+			</if>
+		</if>
+		<if test="null!=param2 and null!=param3">
+			limit #{param2},#{param3}
+		</if>
+	</select>
+	
+</mapper>

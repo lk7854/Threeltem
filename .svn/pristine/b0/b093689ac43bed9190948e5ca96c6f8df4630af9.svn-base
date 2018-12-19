@@ -1,0 +1,15 @@
+package com.aaa.dao.tb;
+
+import com.aaa.entity.ClickTable;
+
+public interface ClickTableDao {
+
+	/**
+	 * 添加点击记录
+	 * 
+	 * @param ct
+	 * @return
+	 */
+	public Integer addct(ClickTable ct);
+
+}

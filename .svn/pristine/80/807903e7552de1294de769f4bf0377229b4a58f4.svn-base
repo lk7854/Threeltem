@@ -1,0 +1,28 @@
+package com.aaa.dao.tb;
+
+import java.util.List;
+import java.util.Map;
+
+import com.aaa.entity.Indent;
+
+public interface IndentDao {
+	/**
+	 * 后台： 分页模糊订单查询
+	 * 
+	 * @param ident
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	public List<Map<String, Object>> select(Indent indent, Integer offset,
+			Integer limit, Integer inst_uid);
+
+	/**
+	 * 审核订单
+	 * 
+	 * @param indent
+	 * @return
+	 */
+	public Integer checkIndent(Indent indent);
+
+}

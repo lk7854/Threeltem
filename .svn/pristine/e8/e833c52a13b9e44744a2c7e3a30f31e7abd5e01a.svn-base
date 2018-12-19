@@ -1,0 +1,19 @@
+package com.aaa.dao.lk;
+
+import java.util.List;
+import java.util.Map;
+/**
+ * 网站
+ * */
+import com.aaa.entity.Channel;
+
+public interface ChannelDao {
+
+	public List<Map<String, Object>> queryChannel();
+	
+	public int addChannel(Channel ch);
+
+	public int updateChannel(Channel ch);
+
+	public int deleteChannel(Integer[] ch_ids);
+}

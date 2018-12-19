@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.FeedBackDao">
+	<select id="query" resultType="Map">
+		select f_id,f_content,u_id,i_id,f_state,f_time,getUname(u_id) uname from feedback
+		<where>
+			<if test="param1!=null">
+				<if test="null!=param1.f_state">
+					and f_state = #{param1.f_state}
+				</if>
+			</if>
+		</where>
+		order by f_state desc
+		<if test="null!=param2 and null!=param3">
+			limit #{param2},#{param3}
+		</if>
+	</select>
+	
+	<update id="upFb">
+		update feedback set f_state=1 where f_id = #{f_id}
+	</update>
+</mapper>

@@ -1,0 +1,21 @@
+package com.aaa.dao.tb;
+
+import com.aaa.entity.Information;
+
+/**
+ * 消息通知的借口方法
+ * 
+ * @author Administrator
+ * 
+ */
+public interface InformationDao {
+
+	/**
+	 * 添加信息通知
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public Integer addInfo(Information info);
+
+}

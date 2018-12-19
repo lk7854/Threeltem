@@ -1,0 +1,36 @@
+package com.aaa.test.jck;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.aaa.dao.jck.JckSlotDao;
+import com.aaa.service.jck.JckSlotService;
+import com.aaa.service.jck.JckusersService;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:applicationContext.xml")
+public class T {
+	/*@Autowired
+	JckusersService jus;*/
+	@Autowired
+	JckSlotDao jsd;
+	@Test
+	public void m(){
+		/*Map<String, Object> showMyselfInfo = jus.showMyselfInfo(2);
+		System.out.println(showMyselfInfo);
+		List<Map<String, Object>> selSlot = jsd.selSlot(null, 1, 10);
+		for (Map<String, Object> map : selSlot) {
+			System.out.println(map);
+		}*/
+		SimpleDateFormat sdt=new SimpleDateFormat("yyyyMMddhhmmss");
+		System.out.println("Orader"+sdt.format(new Date()));
+	}
+}

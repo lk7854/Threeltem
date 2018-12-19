@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.tb.ClickTableDao">
+	<insert id="addct" parameterType="ClickTable">
+		insert into clicktable(i_id) values(#{i_id})
+	</insert>
+	
+	<select id="query" resultType="Map" parameterType="String">
+		select  ct_id,i_id,ct_nums,ct_num,ct_views,ct_exposureCount from clicktable where i_id = #{0}
+	</select>
+	<select id="getTableData" resultType="Map" parameterType="String">
+		SELECT COUNT(*) count, DATE(ip_addtime) date FROM ipaddress WHERE i_id = #{0} GROUP BY DATE(ip_addtime) 
+	</select>
+	
+	<update id="update" parameterType="ClickTable">
+		update ClickTable 
+		<set>
+			<if test="null!=ct_nums">
+				ct_nums = #{ct_nums},
+			</if>
+			<if test="null!=ct_num">
+				ct_num = #{ct_num},
+			</if>
+			<if test="null!=ct_views">
+				ct_views = #{ct_views},
+			</if>
+			<if test="null!=ct_exposureCount">
+				ct_exposureCount = #{ct_exposureCount},
+			</if>
+		</set>
+		where i_id=#{i_id}
+	</update>
+	
+	
+</mapper>

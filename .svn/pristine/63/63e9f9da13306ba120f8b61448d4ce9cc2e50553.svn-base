@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.PosterDaos">
+	
+	<insert id="addPoster" parameterType="Poster">
+		insert into poster(p_id,p_name,u_id,pt_id,p_state,p_addTime,p_remark,p_url,p_formPage) 
+		values(null,#{p_name},#{u_id},#{pt_id},0,now(),#{p_remark},#{p_url},#{p_formPage})
+	</insert>
+	<update id="updatePoster" parameterType="Poster">
+		update poster 
+		 <trim prefix="set" prefixOverrides=",">
+		 	<if test="null!=p_name and ''!=p_name">
+		 		,p_name=#{p_name}
+		 	</if>
+		 	<if test="null!=pt_id">
+		 		,pt_id=#{pt_id}
+		 	</if>
+		 	<if test="null!=p_remark and ''!=p_remark">
+		 		,p_remark=#{p_remark}
+		 	</if>
+		 	<if test="null!=p_url" >
+		 		,p_url=#{p_url}
+		 	</if>
+		 	<if test="null!=p_formPage and ''!=p_formPage">
+		 		,p_formPage=#{p_formPage}
+		 	</if>
+		 	,p_state=0
+		 	,p_updateTime=now()
+		 </trim>
+		 where p_id=#{p_id}
+	</update>
+	<delete id="deletePosters">
+		delete from poster where p_id=#{pid}
+	</delete>
+	<select id="selPosters" resultType="Map">
+		select *,getPTname(pt_id) pt_name from poster 
+		<where>
+			<if test="null!=param1">
+				<if test="null!=param1.u_id">
+			 		and u_id=#{param1.u_id} 
+			 	</if>
+				<if test="null!=param1.p_name">
+			 		and p_name like concat('%',#{param1.p_name},'%')
+			 	</if>
+			 	<if test="null!=param1.pt_id">
+			 		and pt_id=#{param1.pt_id}
+			 	</if>
+			 	<if test="null!=param1.p_state">
+			 		and p_state=#{param1.p_state}
+			 	</if>
+			</if>
+		</where>
+		<if test="null!=param2 and null!=param3">
+		  limit #{param2},#{param3}
+		</if>
+	</select>
+</mapper>

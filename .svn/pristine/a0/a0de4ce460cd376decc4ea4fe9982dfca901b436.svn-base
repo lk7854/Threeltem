@@ -1,0 +1,19 @@
+package com.aaa.dao.tb;
+
+import com.aaa.entity.MoneyChange;
+
+/**
+ * 金额变动记录表接口
+ * 
+ * @author Administrator
+ * 
+ */
+public interface MoneyChangeDaoTB {
+	/**
+	 * 添加记录
+	 * 
+	 * @param mc
+	 * @return
+	 */
+	public Integer addMc(MoneyChange mc);
+}

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.lk.SlotlDao">
+
+	<select id="querySlot" resultType="Map">
+		select s.s_id,s.s_name,
+		s.st_id,st.st_id,st.st_name,st.st_addtime,st.st_updatetime,
+		st.st_remark,
+		s.s_hight,s.s_width,s.s_picture,
+		s.u_id,u.u_id,u.u_name,u.u_pwd,u.user_id,u.u_state,u.in_id,
+		u.r_id,u.u_addtime,u.u_updatetime,
+		s.s_state,s.s_addtime,s.s_updatetime,s.s_remark,s.s_clickcount,
+		s.upu_id,s.s_money,
+		s.ch_id,ch.ch_id,ch.ch_name,ch.in_id,ch.u_id,ch.ch_state,
+		ch.gt_id,ch.gt_pv,ch.ch_addtime,ch.ch_updatetime,ch.ch_url,
+		s.s_oldPrice 
+		from slot s
+		left join users u on u.u_id=s.u_id
+		left join slottype st on st.st_id=s.st_id
+		left join channel ch on ch.ch_id=s.ch_id
+	</select>
+	
+	<insert id="addSlot" parameterType="Slot">
+		<selectKey keyColumn="s_id" keyProperty="s_id" order="BEFORE" resultType="Integer">
+			select MAX(s_id)+1 from slot
+		</selectKey>
+			insert into luser(s_id,s_name,st_id,s_hight,s_width,
+			s_picture,u_id,s_state,s_addtime,s_updatetime,s_remark,
+			s_clickcount,upu_id,s_money,ch_id,s_oldPrice) 
+			values
+			(#{s_id},#{s_name},#{st_id},#{s_hight},#{s_width},#{s_picture},
+			#{u_id},#{s_state},NOW(),NOW(),#{s_remark},#{s_clickcount},
+			#{upu_id},,#{s_money},#{ch_id},#{s_oldPrice})
+	</insert>
+	
+	<update id="updateSlot" parameterType="Slot">
+		update slot
+		<choose>
+				<when test="s_id == null">
+					<set>
+						s_id = -1
+					</set>
+				</when>
+				<otherwise>
+					<set>
+						<if test="s_name != null">
+							s_name = #{s_name},
+						</if>
+						<if test="st_id != null">
+							st_id = #{st_id},
+						</if>
+						<if test="s_hight != null">
+							s_hight = #{s_hight},
+						</if>
+						<if test="s_width != null">
+							s_width = #{s_width},
+						</if>
+						<if test="s_picture != null">
+							s_picture = #{s_picture},
+						</if>
+						<if test="u_id != null">
+							u_id = #{u_id},
+						</if>
+						<if test="s_state != null">
+							s_state = #{s_state},
+						</if>
+						<if test="s_updatetime != null">
+							s_updatetime = NOW(),
+						</if>
+						<if test="s_remark != null">
+							s_remark = #{s_remark},
+						</if>
+						<if test="s_clickcount != null">
+							s_clickcount = #{s_clickcount},
+						</if>
+						<if test="s_money != null">
+							s_money = #{s_money},
+						</if>
+						<if test="s_remark != null">
+							s_remark = #{s_remark},
+						</if>
+						<if test="ch_id != null">
+							ch_id = #{ch_id},
+						</if>
+						<if test="s_oldPrice != null">
+							s_oldPrice = #{s_oldPrice},
+						</if>
+					</set>
+				</otherwise>
+			</choose>
+		<where> 
+			<choose>
+				<when test="s_id == null">
+					s_id=-1
+				</when>
+				<otherwise>
+					s_id=#{s_id}
+				</otherwise>
+			</choose>
+		</where>
+	</update>
+	
+	<delete id="deleteSlot" parameterType="Integer">
+		delete from slot where s_id in(-1
+		<foreach collection="array" index="index" item="s_id" open="," separator=",">
+			#{s_id}
+		</foreach>
+		)
+	</delete>
+	
+</mapper>

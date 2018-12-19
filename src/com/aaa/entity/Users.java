@@ -1,0 +1,104 @@
+package com.aaa.entity;
+
+import java.io.Serializable;
+
+/**
+ * 用户表
+ * 
+ * @author Administrator
+ * 
+ */
+public class Users implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private Integer u_id;
+	private String u_name;
+	private Integer user_id;
+	private Integer u_state;// 状态
+	private Integer in_id;// 机构id
+	private Integer r_id;// 角色id
+	private String u_addtime;// 创建时间
+	private String u_updatetime;// 最后修改时间
+	private String u_pwd;
+
+	public Integer getU_id() {
+		return u_id;
+	}
+
+	public void setU_id(Integer u_id) {
+		this.u_id = u_id;
+	}
+
+	public String getU_name() {
+		return u_name;
+	}
+
+	public void setU_name(String u_name) {
+		this.u_name = u_name;
+	}
+
+	public Integer getU_state() {
+		return u_state;
+	}
+
+	public void setU_state(Integer u_state) {
+		this.u_state = u_state;
+	}
+
+	public Integer getIn_id() {
+		return in_id;
+	}
+
+	public void setIn_id(Integer in_id) {
+		this.in_id = in_id;
+	}
+
+	public Integer getR_id() {
+		return r_id;
+	}
+
+	public void setR_id(Integer r_id) {
+		this.r_id = r_id;
+	}
+
+	public String getU_addtime() {
+		return u_addtime;
+	}
+
+	public void setU_addtime(String u_addtime) {
+		this.u_addtime = u_addtime;
+	}
+
+	public Integer getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(Integer user_id) {
+		this.user_id = user_id;
+	}
+
+	public String getU_updatetime() {
+		return u_updatetime;
+	}
+
+	public void setU_updatetime(String u_updatetime) {
+		this.u_updatetime = u_updatetime;
+	}
+
+	public String getU_pwd() {
+		return u_pwd;
+	}
+
+	public void setU_pwd(String u_pwd) {
+		this.u_pwd = u_pwd;
+	}
+
+	@Override
+	public String toString() {
+		return "Users [u_id=" + u_id + ", u_name=" + u_name + ", user_id="
+				+ user_id + ", u_state=" + u_state + ", in_id=" + in_id
+				+ ", r_id=" + r_id + ", u_addtime=" + u_addtime
+				+ ", u_updatetime=" + u_updatetime + ", u_pwd=" + u_pwd + "]";
+	}
+
+}

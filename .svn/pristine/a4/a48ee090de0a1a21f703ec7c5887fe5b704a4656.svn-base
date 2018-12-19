@@ -1,0 +1,104 @@
+package com.aaa.service.lk;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.aaa.dao.lk.UsersDao;
+import com.aaa.entity.Institution;
+import com.aaa.entity.Users;
+
+@Service
+@Transactional
+public class UsersService {
+	
+	@Autowired
+	private UsersDao uDao;
+	
+	/**
+	 * 登录
+	 * 
+	 * @author Despacito
+	 * 
+	 * @param login 登录
+	 * registe 注册
+	 * @param updateUsers
+	 * 
+	 */
+	public Map<String, Object> login(String name,String pwd,HttpSession session){
+		session.setAttribute("login", uDao.login(name, pwd));
+		return uDao.login(name, pwd);
+	}
+	
+	public String personal(Institution in,Users us,HttpSession session){
+		System.out.println(in);
+		System.out.println(us);
+		int addInstitution = uDao.addInstitution(in);
+		System.out.println(addInstitution);
+		Map<String, Object> list = uDao.queryInstitution(in);
+		if (addInstitution == 1) {
+			us.setIn_id(list.get("in_id").toString());
+			int addUsers = uDao.addUsers(us);
+			System.out.println(addUsers);
+			return "../index";// 成功
+		} else {
+			return "error";// 失败
+		}
+	}
+	public boolean addUsers(Users us){
+		int i = uDao.addUsers(us);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public boolean updateUsers(Users us){
+		int i = uDao.updateUsers(us);
+		System.out.println(i);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public boolean addInstitution(Institution in){
+		int i = uDao.addInstitution(in);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public boolean updateInstitution(Institution in){
+		int i = uDao.updateInstitution(in);
+		System.out.println(i);
+		if (i == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public boolean geren(Users u,Institution in,HttpSession session){
+		int updateusers = uDao.updateUsers(u);
+		System.out.println("updateusers"+updateusers);
+		if (updateusers != 0) {
+			return false;// 修改失败
+		} else {
+			int updateinstitution = uDao.updateInstitution(in);
+			System.out.println("updateinstitution"+updateinstitution);
+			if (updateinstitution == 1) {
+				session.removeAttribute("login");
+				session.setAttribute("login", uDao.login(u.getU_name(), u.getU_pwd()));
+				return true;// 修改成功
+			} else {
+				return false;// 修改失败
+			}
+		}
+	}
+
+}

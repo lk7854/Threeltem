@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.RevokeindentDao">
+	<!-- //添加一条撤单记录
+	public int addRevoke(RevokeIndent r);
+	//查询撤单记录
+	public List<Map<String, Object>> selRevoke(RevokeIndent r); -->
+	<insert id="addRevoke" parameterType="RevokeIndent">
+		insert into RevokeIndent values(null,#{rin_cause},now(),#{u_id},#{i_id},0);
+	</insert>
+	
+	<update id="updateRevoke" parameterType="RevokeIndent">
+		update revokeIndent 
+		<trim prefix="set" prefixOverrides=",">
+			<if test="null!=i_id">
+				,i_id=#{i_id}
+			</if>
+			<if test="null!=rin_state">
+				,rin_state=#{rin_state}
+			</if>
+		</trim>
+		where rin_id=#{rin_id}
+	</update>
+	<select id="selRevoke" parameterType="RevokeIndent" resultType="Map">
+		select * from revokeindent 
+		<where>
+			<if test="null!=i_id">
+				and i_id=#{i_id}
+			</if>
+			<if test="null!=rin_state">
+				and rin_state=#{rin_state}
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.aaa.dao.jck.JckInstitutionDao">
+	<update id="updateInstitution" parameterType="Institution">
+		UPDATE institution 
+			<trim prefix="set" prefixOverrides=",">
+				<if test="null!=in_name and ''!=in_name">
+					,in_name=#{in_name}
+				</if>
+				<if test="null!=in_address and ''!=in_address">
+					,in_address=#{in_address}
+				</if>
+				<if test="null!=in_phone and ''!=in_phone">
+					,in_phone=#{in_phone}
+				</if>
+				<if test="null!=in_man and ''!=in_man">
+					,in_man=#{in_man}
+				</if>
+				<if test="null!=in_remark and ''!=in_remark">
+					,in_remark=#{in_remark}
+				</if>
+				<if test="null!=in_updatetime and ''!=in_updatetime">
+					,in_updatetime=now()
+				</if>
+				<if test="null!=in_state">
+					,in_state=#{in_state}
+				</if>
+			</trim>
+			where in_id=#{in_id}
+	</update>
+</mapper>
